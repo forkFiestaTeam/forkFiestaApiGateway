@@ -115,15 +115,69 @@ app.get('/menu', async (req, res) => {
 		}
 	  `;
 
-		// Encode the query and append it as a URL parameter
-		const encodedQuery = encodeURIComponent(query);
-
 		// Make the GET request using Axios
-		const response = await axios.get(`${menuApi}?query=${encodedQuery}`);
+		const response = await axios.post(menuApi, {
+			query
+		});
 
 		res.json(response.data.data);
 	} catch (error) {
 		res.status(500).json({error: 'Internal Server Error'});
+	}
+});
+
+app.post('/menu', async (req, res) => {
+	try {
+
+		const {name, price, description, category} = req.body
+
+		// Construct the GraphQL query to add a food
+		const query = `
+		mutation {
+			addFood(name: "${name}", price: ${price}, description: "${description}", category: "${category}") {
+				id
+				name
+				price
+				description
+				category
+			}
+		}
+	  `;
+
+		// Make the GET request using Axios
+		const response = await axios.post(menuApi, {
+			query
+		});
+
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: 'Internal Server Error.', err: error});
+	}
+});
+
+app.delete('/menu/:food_id', async (req, res) => {
+	try {
+
+		const {food_id} = req.params
+
+		// Construct the GraphQL query to add a food
+		const query = `
+		mutation {
+			deleteFood(id: "${food_id}") {
+					id
+					name
+				}
+			}
+	  `;
+
+		// Make the GET request using Axios
+		const response = await axios.post(menuApi, {
+			query
+		});
+
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: 'Internal Server Error.', err: error});
 	}
 });
 
