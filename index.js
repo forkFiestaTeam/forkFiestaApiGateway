@@ -1,13 +1,20 @@
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
+require('dotenv').config()
+
+const axios = require('axios');
 const bodyParser = require('body-parser');
+
 const app = express();
-const PORT = 3000;
+app.use(express.json());
 
 // Sample microservices endpoints
-const menuApi = 'http://localhost:4000';
-const deliveryApi = 'http://127.0.0.1:5000/api/forkfiesta';
+const menuApi = process.env.MENU_API;
+const deliveryApi = process.env.DELIVERY_API;
+const userApi = process.env.USER_API;
+const PORT = process.env.PORT || 3001;
+
+console.log('menuApi', menuApi);
 
 // Enable All CORS Requests
 app.use(cors());
@@ -26,6 +33,7 @@ app.post('/write-order', async (req, res) => {
 	}
 });
 
+// ROUTES FOR DELIVERY MICROSERVICE
 app.post('/create-order', async (req, res) => {
 	try {
 		let {name, phone, address, order, observations, sauces, juices, payment_method} = req.body;
@@ -180,6 +188,115 @@ app.delete('/menu/:food_id', async (req, res) => {
 		res.status(500).json({error: 'Internal Server Error.', err: error});
 	}
 });
+
+// ROUTES FOR USER MANAGEMENT MICROSERVICE
+app.get("/users", async (req, res) => {
+	console.log("GET /users");
+	try {
+		const response = await axios.get(`http://localhost:3002/users`);
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+})
+
+app.get("/users/:id", async (req, res) => {
+	console.log("GET /user/:id");
+	try {
+		const id = req.params.id;
+		const response = await axios.get(`${userApi}/users/${id}`);
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+});
+
+app.post("/create-user", async (req, res) => {
+	console.log("POST /create-user");
+	try {
+		const {id, name, email} = req.body;
+
+		const response = await axios.post(`${userApi}/create-user`, {id, name, email}, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+})
+
+app.post("/update-user", async (req, res) => {
+	try {
+		const {name, email} = req.body;
+
+		const response = await axios.post(`${userApi}/update-user`, {name, email}, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+})
+
+app.post("/delete-user", async (req, res) => {
+	try {
+		const {id} = req.body;
+
+		const formData = new FormData();
+		formData.append("id", id);
+
+		const response = await axios.post(`${userApi}/delete-user`, formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		});
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+})
+
+app.get("/address", async (req, res) => {
+	try {
+		const response = await axios.get(`${userApi}/address`);
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+});
+
+app.get("/address/:id", async (req, res) => {
+	try {
+		const id = req.params.id;
+		const response = await axios.get(`${userApi}/address/${id}`);
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+});
+
+app.post("/create-address", async (req, res) => {
+	try {
+		const {user_id, name, address, address_details, phone, city} = req.body;
+
+		const response = await axios.post(`${userApi}/create-address`, {user_id, name, address, address_details, phone, city}, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: "Internal Server Error"});
+	}
+});
+
+
+
+
 
 // Start the server
 app.listen(PORT, () => {
