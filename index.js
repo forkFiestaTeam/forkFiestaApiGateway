@@ -15,7 +15,9 @@ const reservationApi = process.env.RESERVATION_API;
 const userApi = process.env.USER_API;
 const PORT = process.env.PORT || 3001;
 
-console.log('menuApi', menuApi);
+console.log('Running Menu API at', menuApi);
+console.log('Running Delivery API at', deliveryApi);
+console.log('Running UserManagement API at', userApi);
 
 // Enable All CORS Requests
 app.use(cors());
@@ -62,9 +64,11 @@ app.post('/create-order', async (req, res) => {
 });
 
 app.get('/orders', async (req, res) => {
+	console.log('GET /user-orders');
 	try {
-		const response = await axios.get(`${deliveryApi}/orders`);
-		res.json(response.data);
+		const response = await fetch(`${deliveryApi}/orders`);
+		const data = await response.json();
+		res.json(data.message);
 	} catch (error) {
 		res.status(500).json({error: 'Internal Server Error'});
 	}
@@ -110,6 +114,7 @@ app.post('/feedbacks', async (req, res) => {
 
 // ROUTES FOR MENU MICROSERVICE
 app.get('/menu', async (req, res) => {
+	console.log('GET /menu');
 	try {
 		// Construct the GraphQL query
 		const query = `
@@ -267,6 +272,7 @@ app.post('/delete-user', async (req, res) => {
 	}
 });
 
+
 app.get('/address', async (req, res) => {
 	try {
 		const response = await axios.get(`${userApi}/address`);
@@ -357,5 +363,5 @@ app.post('/update-reservation/:id', async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-	console.log(`API Gateway listening on port ${PORT}`);
+	console.log(`\nAPI Gateway listening on port ${PORT}`);
 });
