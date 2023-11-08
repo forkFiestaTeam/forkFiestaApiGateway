@@ -39,6 +39,8 @@ app.post('/write-order', async (req, res) => {
 // ROUTES FOR DELIVERY MICROSERVICE
 app.post('/create-order', async (req, res) => {
 	try {
+		console.log('POST /create-order');
+
 		let {name, phone, address, order, observations, sauces, juices, payment_method} = req.body;
 
 		const formData = new FormData();
@@ -51,11 +53,14 @@ app.post('/create-order', async (req, res) => {
 		formData.append('juices', juices);
 		formData.append('payment_method', payment_method);
 
+		// console.log('FORM DATA:', formData.get('name'));
+
 		const response = await axios.post(`${deliveryApi}/create-order`, formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
 		});
+
 		res.json(response.data);
 		// res.json({message: 'ok'});
 	} catch (error) {
@@ -66,11 +71,10 @@ app.post('/create-order', async (req, res) => {
 app.get('/orders', async (req, res) => {
 	console.log('GET /user-orders');
 	try {
-		const response = await fetch(`${deliveryApi}/orders`);
-		const data = await response.json();
-		res.json(data.message);
+		const response = await axios.get(`${deliveryApi}/orders`);
+		res.json(response.data.message);
 	} catch (error) {
-		res.status(500).json({error: 'Internal Server Error'});
+		res.status(500).json({error: 'Internal Server Error', err: error});
 	}
 });
 
@@ -271,7 +275,6 @@ app.post('/delete-user', async (req, res) => {
 		res.status(500).json({error: 'Internal Server Error'});
 	}
 });
-
 
 app.get('/address', async (req, res) => {
 	try {
