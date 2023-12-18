@@ -41,7 +41,7 @@ app.post('/create-order', async (req, res) => {
 	try {
 		console.log('POST /create-order');
 
-		let {name, phone, address, order, observations, sauces, juices, payment_method} = req.body;
+		let {name, phone, address, order, observations, sauces, juices, payment_method, user_id} = req.body;
 
 		const formData = new FormData();
 		formData.append('name', name);
@@ -52,6 +52,7 @@ app.post('/create-order', async (req, res) => {
 		formData.append('sauces', sauces);
 		formData.append('juices', juices);
 		formData.append('payment_method', payment_method);
+		formData.append('user_id', user_id);
 
 		// console.log('FORM DATA:', formData.get('name'));
 
@@ -77,6 +78,7 @@ app.get('/orders', async (req, res) => {
 		res.status(500).json({error: 'Internal Server Error', err: error});
 	}
 });
+
 
 app.get('/orders/:id', async (req, res) => {
 	try {
@@ -222,11 +224,12 @@ app.get('/users/:id', async (req, res) => {
 app.post('/create-user', async (req, res) => {
 	console.log('POST /create-user');
 	try {
-		const {id, name, email} = req.body;
-
+		const {id, name, email, role} = req.body;
+		console.log(role)
+		
 		const response = await axios.post(
 			`${userApi}/create-user`,
-			{id, name, email},
+			{id, name, email,role},
 			{
 				headers: {
 					'Content-Type': 'application/json',
