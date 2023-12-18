@@ -328,6 +328,17 @@ app.get('/reservations', async (req, res) => {
 		res.status(500).json({error: 'Internal Server Error'});
 	}
 });
+app.get('/reservations/:id', async (req, res) => {
+	try {
+	  const id = req.params.id;
+	  console.log('ID:', id);
+	  const response = await axios.get(`${reservationApi}/getbyuid/${id}`);
+	  res.json(response.data);
+	} catch (error) {
+	  
+	  res.status(500).json({ error: 'Internal Server Error' });
+	}
+  });
 
 app.post('/create-reservation', async (req, res) => {
 	try {
@@ -365,6 +376,24 @@ app.post('/update-reservation/:id', async (req, res) => {
 		res.json(response.data);
 	} catch (error) {
 		res.status(500).json({error: 'Internal Server Error', err: error});
+	}
+});
+app.post('/delete-reservation', async (req, res) => {
+	try {
+		const {id} = req.body;
+
+		const formData = new FormData();
+		formData.append('id', id);
+		console.log(id)
+
+		const response = await axios.delete(`${reservationApi}/delete/${id}`, formData, {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		});
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({error: 'Internal Server Error'});
 	}
 });
 
