@@ -323,6 +323,7 @@ app.get('/reservations', async (req, res) => {
 	try {
 		const response = await axios.get(`${reservationApi}`);
 		res.json(response.data);
+		console.log(response.data)
 	} catch (error) {
 		res.status(500).json({error: 'Internal Server Error'});
 	}
@@ -330,11 +331,11 @@ app.get('/reservations', async (req, res) => {
 
 app.post('/create-reservation', async (req, res) => {
 	try {
-		const {reservation_name, date, hour, guest_number, event_type} = req.body;
-
+		const {reservation_name,uid, date, hour, guest_number, event_type} = req.body;
+		console.log("Hola")
 		const response = await axios.post(
 			`${reservationApi}/add`,
-			{reservation_name, date, hour, guest_number, event_type},
+			{reservation_name,uid, date, hour, guest_number, event_type},
 			{
 				headers: {
 					'Content-Type': 'application/json',
@@ -350,11 +351,11 @@ app.post('/create-reservation', async (req, res) => {
 app.post('/update-reservation/:id', async (req, res) => {
 	try {
 		const id = req.params.id;
-		const {reservation_name, date, hour, guest_number, event_type} = req.body;
+		const {reservation_name,uid, date, hour, guest_number, event_type} = req.body;
 
 		const response = await axios.update(
 			`${reservationApi}/update/${id}`,
-			{reservation_name, date, hour, guest_number, event_type},
+			{reservation_name,uid, date, hour, guest_number, event_type},
 			{
 				headers: {
 					'Content-Type': 'application/json',
